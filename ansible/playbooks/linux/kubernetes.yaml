@@ -1,13 +1,6 @@
 ---
 - name: Build Kubernetes Cluster
   hosts: localhost
-  #vars:
-  #  masternode: kube01.lab.local
-  #  workernode1: kube02.lab.local
-  #  ansible_user: xadmin
-  #  ansible_password: password
-  #  ansible_become_pass: password
-  #  k8s_version: 1.19.16-00
   tasks:
 
   - name: Load Variables
@@ -32,21 +25,6 @@
       ansible_user={{ ansible_user }}
       ansible_password={{ ansible_password }}
       ansible_become_pass={{ ansible_become_pass }}
-
-#      [master]
-#      kube01.lab.local
-#
-#      [workers]
-#      kube02.lab.local
-#
-#      [k8s:children]
-#      master
-#      workers
-#
-#      [k8s:vars]
-#      ansible_user=xadmin
-#      ansible_password=password
-#      ansible_become_pass=password
 
   - meta: refresh_inventory
 
