@@ -1,0 +1,9 @@
+---
+masternode: kube01.lab.local
+workernode1: kube02.lab.local
+ansible_user: xadmin
+ansible_password: password
+ansible_become_pass: password
+k8s_version: 1.19.16-00
+#masternode: kube01.lab.local
+#k8s_version: 1.19.16-00

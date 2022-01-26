@@ -1,0 +1,9 @@
+---
+- name: Deploy SSH Key
+  authorized_key: 
+    user: xadmin
+    state: present
+    key: "{{ lookup('file', '/home/admin/.ssh/id_rsa.pub') }}"
+
+- name: Initialize System
+  include_tasks: sys_install.yaml

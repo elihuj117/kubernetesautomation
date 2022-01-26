@@ -1,0 +1,24 @@
+---
+- name: Copy join token to worker nodes
+  copy:
+    src: /tmp/kubeadm_join_token
+    dest: /tmp/kubeadm_join_token
+    mode: 0777
+  become: yes
+
+- name: Join worker nodes to cluster
+  shell: |
+    sh /tmp/kubeadm_join_token
+  register: join_output
+  become: yes
+
+- name: Print results
+  debug:
+    msg: "{{ join_output.stdout_lines }}"
+  become: yes
+
+- name: Cleanup
+  file:
+    path: /tmp/kubeadm_join_token
+    state: absent
+  become: yes

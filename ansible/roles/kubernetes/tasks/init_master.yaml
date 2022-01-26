@@ -1,0 +1,66 @@
+---
+- name: Initialize the cluster
+  shell: |
+    kubeadm init
+  become:  yes
+  
+- name: Create .kube directory
+  file:
+    path: /home/xadmin/.kube
+    state: directory
+    mode: 0755
+  become:  yes
+    
+- name: Copy .kube config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/xadmin/.kube/config
+    remote_src: yes
+    owner: xadmin
+  become:  yes
+    
+- name: Download Cilium
+  get_url:
+    url: https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
+    dest: /home/xadmin
+  become:  yes
+
+- name: Untar Cilium
+  unarchive:
+    src: /home/xadmin/cilium-linux-amd64.tar.gz
+    dest: /usr/local/bin
+    remote_src: yes
+  become: yes
+
+- name: Install Cilium
+  shell: |
+    cilium install
+    
+- name: Wait for Cilium
+  shell: |
+    cilium status --wait
+    
+#- name: Execute Cilium Connectivity Test
+#  shell: |
+#    cilium connectivity test
+#  register: job_result
+#  until: job_result.finished
+#  delay: 60
+#  retries: 10
+  
+#- name: Result
+#  debug:
+#    msg: "{{ job_result }}"
+  
+- name: Get join token for worker nodes
+  shell: |
+    kubeadm token create --print-join-command
+  register: kubeadm_join_token
+  become: yes
+    
+- debug: 
+    msg: "{{ kubeadm_join_token.stdout }}"
+  
+- name: Copy join token to temporary file
+  local_action: copy content="{{ kubeadm_join_token.stdout_lines[0] }}" dest="/tmp/kubeadm_join_token" mode=0777
+  become: yes

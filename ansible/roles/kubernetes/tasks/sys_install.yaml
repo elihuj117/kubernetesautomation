@@ -1,0 +1,115 @@
+---
+- name: Configure modprobe
+  shell: |
+    modprobe br-netfilter
+    echo "br-netfilter" >> /etc/modules-load.d/modules.conf
+  become: yes 
+
+- name: Disable Swap
+  shell: |
+    swapoff -a
+    sed -i '/ swap / s/^\(.*\)$/\1/g' /etc/fstab
+  become: yes 
+
+- name: Update the system
+  apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+  register: upgrade
+  retries: 5
+  delay: 120
+  until: upgrade is success
+  become: yes 
+
+- name: Install Docker and dependencies
+  apt: 
+    pkg:
+    - docker.io 
+    - apt-transport-https
+    - curl
+    update_cache: yes
+    force_apt_get: yes
+  register: upgrade
+  retries: 5
+  delay: 120
+  until: upgrade is success
+  become: yes 
+
+- name: Start Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes 
+
+- name: Add K8S GPG Key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+  become: yes 
+
+- name: Add K8S Repo
+  apt_repository: 
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+  become: yes 
+
+- name: Update the repo
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+  register: upgrade
+  retries: 5
+  delay: 120
+  until: upgrade is success
+  become: yes 
+
+- name: Install K8S
+  apt:
+    pkg:
+    - kubeadm={{ k8s_version }}
+    - kubelet={{ k8s_version }}
+    - kubectl={{ k8s_version }}
+    update_cache: yes
+    force_apt_get: yes
+  register: upgrade
+  retries: 5
+  delay: 120
+  until: upgrade is success
+  become: yes 
+
+- name: Set systemd for Docker
+  shell: |
+    cat <<EOF | sudo tee /etc/docker/daemon.json
+    {
+      "exec-opts": ["native.cgroupdriver=systemd"],
+      "log-driver": "json-file",
+      "log-opts": {
+        "max-size": "100m"
+      },
+      "storage-driver": "overlay2"
+    }
+    EOF
+  become: yes 
+
+- name: Daemon Reload
+  shell: |
+    systemctl daemon-reload
+  become: yes 
+
+- name: Reload Docker
+  service:
+    name: docker
+    state: restarted
+  become: yes 
+  
+- name: Configure Master Node
+  include_tasks: init_master.yaml
+  when: "'master' in group_names"
+
+- name: Configure Worker Node
+  include_tasks: init_worker.yaml
+  when: "'workers' in group_names"
