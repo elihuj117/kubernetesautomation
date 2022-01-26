@@ -1,0 +1,23 @@
+vsphere_server=""
+vsphere_user=""
+vsphere_password=""
+datacenter_name=""
+datastore_cluster=""
+cluster_name=""
+network_name=""
+template_name="ubu-template.lab.local"
+domain_name="lab.local"
+vmdk=".vmdk"
+dnsserver=""
+
+k8s = [
+    {
+      vm_name="kube01"
+      ipaddress="172.16.2.21"
+    },
+    {
+      vm_name="kube02"
+      ipaddress="172.16.2.22"
+    }
+]
+

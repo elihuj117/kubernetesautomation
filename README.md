@@ -1,7 +1,7 @@
 # Deploying a Kubernetes Cluster with Terraform and Ansible
 
 ### Terraform
-In progress
+I am using a list variable in my terraform.tfvars file to deploy the necessary amount of Kubernetes node virtual machines. This allows me to input information such as hostname, and IP address, which I can then feed into my main.tf file.
 
 ### Ansible
 This is an Ansible role to deploy a Kubernetes cluster on Ubuntu, which performs the following tasks:
@@ -9,6 +9,7 @@ This is an Ansible role to deploy a Kubernetes cluster on Ubuntu, which performs
 - Update the Ansible inventory file
 - Add the public key to the nodes
 - Install Kubernetes, and Docker on each node
+- Install Cilium
 - Configure the Master node
 - Join the Worker node(s) to the cluster
 - Cleanup
