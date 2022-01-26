@@ -15,4 +15,4 @@ This is an Ansible role to deploy a Kubernetes cluster on Ubuntu, which performs
 
 I wanted to make this process as automated as possible with no manual input during the handoff from Terraform to Ansible. I have a play in the kubernetes.yaml playbook file to update the Ansible inventory with the Master, and Worker node information, including the ansible_user, and ansible_password parameters. This allowed me to connect to the instances, and copy over the public key for future authentication. 
 
-I will be lookingt o implement a cleanup to remove the ansible_password parameter as it is no longer required.
+I will be looking to implement a cleanup to remove the ansible_password parameter as it is no longer required.
